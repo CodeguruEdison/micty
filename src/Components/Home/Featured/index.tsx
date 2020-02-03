@@ -1,10 +1,13 @@
 import React from 'react'
 import { FC } from 'react';
-
+import Stripes from './Stripes';
+import Text from './Text';
  const Featured:FC = () => {
     return (
         <div className="featured_wrapper">
-            Text
+            Some Text
+            <Stripes></Stripes>
+            <Text></Text>
         </div>
     )
 }
