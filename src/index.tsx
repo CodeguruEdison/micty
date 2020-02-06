@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 import {BrowserRouter as Router} from 'react-router-dom';
 
 import Routes from './Routes';
+//import './firebase';
 //import * as serviceWorker from './serviceWorker';
+
 const App:FC = ()=> {
     return(
         <Router>

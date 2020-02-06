@@ -1,5 +1,6 @@
 import React, { FC } from 'react'
 import Tag from '../../ui/misc';
+import Blocks from './Blocks';
 
 export const Matches:FC = () => {
     return (
@@ -10,8 +11,12 @@ export const Matches:FC = () => {
                 fontSize={'50px'} color='#ffffff'>
                     Matches
                 </Tag>
-               Block
-               TAG
+               <Blocks/>
+               <Tag islink={true} linkto={'the_team'} 
+                background='#ffffff' 
+                fontSize={'22px'} color='#0e1731'>
+                    See more matches
+                </Tag>
             </div>
         </div>
     )
