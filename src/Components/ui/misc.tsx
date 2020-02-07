@@ -8,14 +8,15 @@ export const Tag:FC<IMiscProps> =(props) => {
         linkto,
         background,
         fontSize,
-        color,children}= props;
+        color,children,add}= props;
     const style= {
         background,
-        size:fontSize,
+        fontSize:fontSize,
         color,
         padding:'5px 10px',
         display:'inline-block',
-        fontFamily:'Righteous'
+        fontFamily:'Righteous',
+        ...add
 
 
     }    

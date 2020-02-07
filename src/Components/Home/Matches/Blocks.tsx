@@ -3,6 +3,7 @@ import {firebaseMatches,getMatches} from '../../../firebase';
 import { IMatch } from '../../../models/IMatch';
 import {firebaselooper,reverseArray} from '../../ui/misc';
 import MatchesBlock from '../../ui/matches_block';
+import Slide from 'react-reveal/Slide';
 
 export const Blocks:FC = () => {
     const [matches,setMatches]= useState<IMatch[]>([]);
@@ -16,20 +17,18 @@ export const Blocks:FC = () => {
     
     //console.log(matches);
 
-    const showMatches =(matches:IMatch[])=> (
-        matches ? 
-             matches.map((match)=>(
-                    <div className='item' key={match.id}>
-                        <div className="wrapper">
-                            <MatchesBlock  match={match}  >
-
-                            </MatchesBlock>
-                        </div>
-                    </div>
-             ))
-        :null
-
-    );
+    const showMatches = (matches: IMatch[]) =>
+      matches
+        ? matches.map(match => (
+            <Slide bottom key={match.id}>
+              <div className="item">
+                <div className="wrapper">
+                  <MatchesBlock match={match}></MatchesBlock>
+                </div>
+              </div>
+            </Slide>
+          ))
+        : null;
         
     return (
         

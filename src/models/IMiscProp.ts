@@ -3,5 +3,6 @@ export interface IMiscProps {
     linkto:string,
     background:string,
     fontSize:string,
-    color:string
+    color:string,
+    add?:any
 }
