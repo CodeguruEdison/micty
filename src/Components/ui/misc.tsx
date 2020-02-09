@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { IMiscProps } from '../../models/IMiscProp';
 import { IMatch } from '../../models/IMatch';
+import { IEnrollElement } from '../Home/Promotions/Enroll';
 
 export const Tag:FC<IMiscProps> =(props) => {
     const { islink,
@@ -52,3 +53,21 @@ export const reverseArray =(actualArray:Array<any>) =>{
      }
      return reversedArray;
 }
+export const validate = (inputElement:IEnrollElement) =>{
+    let error = [{isValid:true,message:''}];
+    //const default:{isValid:boolean,message:string} = {isValid:true,message:''};
+     if(inputElement.validation.isEmail){
+         const isValid = /\S+@\S+\.\S+/.test(inputElement.value);
+         const message =`${!isValid ? 'Must be a valid email': ''}`;
+         error =!isValid ? [{isValid,message}]:error;
+     }
+
+    if(inputElement.validation.isRequired) {
+        const isValid =inputElement.value.trim() !=='';
+        const message = `${!isValid ? 'This field is required': ''}`;
+        error =!isValid ? [{isValid,message}]:error;
+        //error.push(isInValid,message);
+    }
+    return error;
+}
+ 

@@ -1,13 +1,16 @@
 import React from 'react'
-import PrmotionEnroll from './Enroll';
+import Enroll from './Enroll';
+import PromotionAnimation from './Animation';
 
 export const Promotion = () => {
     return (
         <div className="promotion_wrapper" style={{background:'#ffffff'}}>
              <div className="container">
-                 <PrmotionEnroll>
-                     
-                 </PrmotionEnroll>
+             <PromotionAnimation>
+                 
+             </PromotionAnimation>
+             <Enroll></Enroll>
+                 
              </div>
         </div>
     )
