@@ -1,4 +1,4 @@
-import React, { FC, ChangeEvent, SyntheticEvent } from "react";
+import React, { FC} from "react";
 import { IUpdateForm, IFormData } from "../Home/Promotions/Enroll";
 
 export interface IFormFieldConfig {
@@ -30,9 +30,11 @@ const FormField: FC<IFormFieldsProps> = props => {
   const showError = (formField: IFormFieldConfig) => {
     const errorMessage = (
       <div className="error_label">
-        {formField.validation && !formField.isValid
+        {
+        formField.validation && !formField.isValid
           ? formField.validationMessage
-          : null}
+          : null
+          }
       </div>
     );
     return errorMessage;
