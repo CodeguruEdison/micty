@@ -3,6 +3,7 @@ import "firebase/app";
 import "firebase/database";
 import { firebaselooper } from "./Components/ui/misc";
 import { IMatch } from "./models/IMatch";
+import "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC-3NUj9I6NQbiy5KQjn3_312qXWfQkgGs",
@@ -18,6 +19,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 const firebaseDB = firebase.database();
+const firebaseAuth = firebase.auth();
 const firebaseMatches = firebaseDB.ref("matches");
 const firebasePromotions = firebaseDB.ref("promotions");
 
@@ -27,7 +29,13 @@ const getMatches = async (limitTo: number): Promise<IMatch[]> => {
   return firebaselooper(snapshot);
 };
 
-export { firebaseDB, firebaseMatches, getMatches,firebasePromotions };
+export {
+  firebaseDB,
+  firebaseMatches,
+  getMatches,
+  firebasePromotions,
+  firebaseAuth
+};
 //getMatches();
 
 /*const snapShot= await firebaseDB.ref('matches').once('value');

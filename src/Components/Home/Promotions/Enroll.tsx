@@ -1,14 +1,16 @@
-import React, { FC, useState, ChangeEvent} from "react";
+import React, { FC, useState, ChangeEvent } from "react";
 import Fade from "react-reveal/Fade";
 import FormField from "../../ui/FormField";
 import { validate } from "../../ui/misc";
 import { firebasePromotions } from "../../../firebase";
+import { Editor } from "../../ui/FormField";
 
 export interface IEnrollData {
   formData: IFormData;
 }
 export interface IFormData {
-  email: IEnrollElement;
+  //email: IFormElement;
+  [k: string]: IFormElement;
   //test:IEnrollElement
 }
 export interface IElementConfig {
@@ -17,11 +19,12 @@ export interface IElementConfig {
   placeholder: string;
 }
 export interface IValidationRule {
-  isRequired: boolean;
-  isEmail: boolean;
+  /*isRequired: boolean;
+  isEmail: boolean;*/
+  [k: string]: boolean;
 }
-export interface IEnrollElement {
-  element: string;
+export interface IFormElement {
+  editor: Editor;
   value: string;
   config: IElementConfig;
   validation: IValidationRule;
@@ -42,7 +45,7 @@ export const Enroll: FC = () => {
     success: "",
     formData: {
       email: {
-        element: "input",
+        editor: "input",
         value: "",
         config: {
           name: "email_input",
@@ -60,7 +63,7 @@ export const Enroll: FC = () => {
   };
   const [enrollState, setEnrollState] = useState<IEnrollState>(initialState);
   const { formData } = enrollState;
-  const submitForm = (e: HTMLFormElement) => {};
+  const submitForm = (e: React.FormEvent<HTMLFormElement>) => {};
 
   /*function getProps<T, K extends keyof T>(obj: T, key: K) {
         return obj[key];
@@ -81,18 +84,20 @@ export const Enroll: FC = () => {
     }
     if (formIsValid) {
       //console.log(dataToSubmit);
-      firebasePromotions.orderByChild('email').equalTo(dataToSubmit.email).once('value')
-      .then((snapshot)=>{
-         // console.log('here');
+      firebasePromotions
+        .orderByChild("email")
+        .equalTo(dataToSubmit.email)
+        .once("value")
+        .then(snapshot => {
+          // console.log('here');
           //console.log(snapshot.val());
-          if(snapshot.val() === null ){
+          if (snapshot.val() === null) {
             firebasePromotions.push(dataToSubmit);
-            resetFormSuccess(true)
-          }
-          else{
+            resetFormSuccess(true);
+          } else {
             resetFormSuccess(false);
           }
-      })
+        });
 
       //resetFormSuccess();
     } else {
@@ -105,7 +110,7 @@ export const Enroll: FC = () => {
 
     e.preventDefault();
   };
-  const resetFormSuccess = (inputType:boolean) => {
+  const resetFormSuccess = (inputType: boolean) => {
     const newFormData = { ...formData };
     for (let element in newFormData) {
       const key = element as keyof IFormData;
@@ -113,23 +118,22 @@ export const Enroll: FC = () => {
       newFormData[key].isValid = false;
       newFormData[key].validationMessage = "";
     }
-    setEnrollState({ ...enrollState,
-         formData: newFormData, 
-         isError: false,
-         success: inputType ?'Congratulations' :'Already on the  Database'
-         });
-     successMessage();    
+    setEnrollState({
+      ...enrollState,
+      formData: newFormData,
+      isError: false,
+      success: inputType ? "Congratulations" : "Already on the  Database"
+    });
+    successMessage();
   };
   const successMessage = () => {
-    setTimeout(()=>{
-        setEnrollState({
-            ...enrollState,
-            success:''
-        })
-
-    
-    },2000);
-  }
+    setTimeout(() => {
+      setEnrollState({
+        ...enrollState,
+        success: ""
+      });
+    }, 2000);
+  };
   const updateForm = (element: IUpdateForm) => {
     // console.log(element);
     const newFormData = { ...formData };

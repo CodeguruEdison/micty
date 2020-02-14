@@ -1,8 +1,9 @@
-import React, { FC} from "react";
+import React, { FC } from "react";
 import { IUpdateForm, IFormData } from "../Home/Promotions/Enroll";
 
+export type Editor = "input" | "multilinetextbox" | "dropdown";
 export interface IFormFieldConfig {
-  element: string;
+  editor: Editor;
   value: string;
   config: {
     name: string;
@@ -10,8 +11,9 @@ export interface IFormFieldConfig {
     //placeholder:string
   };
   validation: {
-    isRequired: boolean;
-    isEmail: boolean;
+    [k: string]: boolean;
+    /*isRequired: boolean;
+    isEmail: boolean;*/
   };
   isValid: boolean;
   validationMessage: string;
@@ -30,18 +32,16 @@ const FormField: FC<IFormFieldsProps> = props => {
   const showError = (formField: IFormFieldConfig) => {
     const errorMessage = (
       <div className="error_label">
-        {
-        formField.validation && !formField.isValid
+        {formField.validation && !formField.isValid
           ? formField.validationMessage
-          : null
-          }
+          : null}
       </div>
     );
     return errorMessage;
   };
   const renderTemplate = () => {
     let formTemplate = null;
-    switch (formData.element) {
+    switch (formData.editor) {
       case "input":
         formTemplate = (
           <div>
@@ -61,4 +61,5 @@ const FormField: FC<IFormFieldsProps> = props => {
   };
   return <div>{renderTemplate()}</div>;
 };
+
 export default FormField;
