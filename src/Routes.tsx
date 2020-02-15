@@ -6,14 +6,39 @@ import { Switch, Route } from "react-router-dom";
 import { Home } from "./Components/Home";
 import SignIn from "./Components/SignIn";
 import DashBoard from "./Components/Admin/DashBoard";
+import PrivateRoute from "./Components/authRoutes/privateRoute";
+import PublicRoute from "./Components/authRoutes/publicRoutes";
 
 const Routes: React.FC<IRoutes> = props => {
+  const { user } = props;
+  //console.log("1");
+  console.log(user);
+  //console.log("2");
   return (
     <Layout>
       <Switch>
-        <Route exact={true} component={DashBoard} path="/dashboard" />
-        <Route exact={true} component={SignIn} path="/sign_in" />
-        <Route exact={true} component={Home} path="/" />
+        <PrivateRoute
+          {...props}
+          exact={true}
+          component={DashBoard}
+          path="/dashboard"
+          redirectUrl="/sign_in"
+        />
+
+        <PublicRoute
+          restricted={true}
+          {...props}
+          path="/sign_in"
+          exact={true}
+          component={SignIn}
+        ></PublicRoute>
+        <PublicRoute
+          restricted={false}
+          {...props}
+          path="/"
+          exact={true}
+          component={Home}
+        ></PublicRoute>
       </Switch>
     </Layout>
   );

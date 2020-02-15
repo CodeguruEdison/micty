@@ -1,3 +1,4 @@
 export default interface IRoutes {
-   // name:string
+  // name:string
+  user: firebase.User | null;
 }
