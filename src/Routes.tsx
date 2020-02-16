@@ -2,12 +2,13 @@ import React from "react";
 import "./Resources/css/app.css";
 import IRoutes from "./models/IRoutes";
 import { Layout } from "./Components/Hoc/Layout";
-import { Switch, Route } from "react-router-dom";
+import { Switch } from "react-router-dom";
 import { Home } from "./Components/Home";
 import SignIn from "./Components/SignIn";
 import DashBoard from "./Components/Admin/DashBoard";
 import PrivateRoute from "./Components/authRoutes/privateRoute";
 import PublicRoute from "./Components/authRoutes/publicRoutes";
+import AdminMatches from "./Components/Admin/Matches/index";
 
 const Routes: React.FC<IRoutes> = props => {
   const { user } = props;
@@ -17,6 +18,14 @@ const Routes: React.FC<IRoutes> = props => {
   return (
     <Layout>
       <Switch>
+        <PrivateRoute
+          {...props}
+          exact={true}
+          component={AdminMatches}
+          path="/admin_matches"
+          redirectUrl="/sign_in"
+        />
+
         <PrivateRoute
           {...props}
           exact={true}

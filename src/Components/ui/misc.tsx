@@ -24,7 +24,7 @@ export const Tag: FC<IMiscProps> = props => {
 };
 export default Tag;
 
-export const firebaselooper = (
+export const firebaseLooper = (
   snapshot: firebase.database.DataSnapshot
 ): IMatch[] => {
   const data: IMatch[] = [];

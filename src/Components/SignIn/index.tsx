@@ -80,7 +80,7 @@ const SignIn: FC<IFormProps> = props => {
           console.log("user is auth");
           history.push("/dashboard");
         })
-        .catch(error => {
+        .catch(() => {
           setSignInState({
             ...signInState,
             isError: true
@@ -104,7 +104,6 @@ const SignIn: FC<IFormProps> = props => {
     //console.log(element.id);
     //  console.log(newFormData[id]);
     if (element.event.target instanceof HTMLInputElement) {
-      const currentTarget = element.event.target as HTMLInputElement;
       const newElement = { ...newFormData[element.id] };
       newElement.value = element.event.target.value;
 
@@ -124,7 +123,6 @@ const SignIn: FC<IFormProps> = props => {
       //console.log(currentTarget.value);
     }
   };
-  const handleSignIn = () => {};
   return (
     <div className="div">
       <div className="container">

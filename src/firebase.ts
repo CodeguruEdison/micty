@@ -1,7 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/app";
 import "firebase/database";
-import { firebaselooper } from "./Components/ui/misc";
+import { firebaseLooper } from "./Components/ui/misc";
 import { IMatch } from "./models/IMatch";
 import "firebase/auth";
 
@@ -26,7 +26,7 @@ const firebasePromotions = firebaseDB.ref("promotions");
 const getMatches = async (limitTo: number): Promise<IMatch[]> => {
   //const eventref= firebaseDB.ref('matches');
   const snapshot = await firebaseMatches.limitToLast(limitTo).once("value");
-  return firebaselooper(snapshot);
+  return firebaseLooper(snapshot);
 };
 
 export {
