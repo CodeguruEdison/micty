@@ -16,7 +16,9 @@ export interface IFormData {
 export interface IElementConfig {
   name: string;
   type: string;
-  placeholder: string;
+  placeholder?: string;
+  label?: string;
+  options?: any[];
 }
 export interface IValidationRule {
   /*isRequired: boolean;
@@ -30,6 +32,7 @@ export interface IFormElement {
   validation: IValidationRule;
   isValid: boolean;
   validationMessage: string;
+  showLabel?: boolean;
 }
 export interface IEnrollState extends IEnrollData {
   isError: boolean;

@@ -9,11 +9,12 @@ import DashBoard from "./Components/Admin/DashBoard";
 import PrivateRoute from "./Components/authRoutes/privateRoute";
 import PublicRoute from "./Components/authRoutes/publicRoutes";
 import AdminMatches from "./Components/Admin/Matches/index";
+import { AddEditMatch } from "./Components/Admin/Matches/addEditMatch";
 
 const Routes: React.FC<IRoutes> = props => {
   const { user } = props;
   //console.log("1");
-  console.log(user);
+  //console.log(user);
   //console.log("2");
   return (
     <Layout>
@@ -23,6 +24,13 @@ const Routes: React.FC<IRoutes> = props => {
           exact={true}
           component={AdminMatches}
           path="/admin_matches"
+          redirectUrl="/sign_in"
+        />
+        <PrivateRoute
+          {...props}
+          exact={true}
+          component={AddEditMatch}
+          path="/admin_matches/edit_match/:id"
           redirectUrl="/sign_in"
         />
 

@@ -1,13 +1,15 @@
 import React, { FC } from "react";
 import { IUpdateForm, IFormData } from "../Home/Promotions/Enroll";
 
-export type Editor = "input" | "multilinetextbox" | "dropdown";
+export type Editor = "input" | "multilinetextbox" | "dropdown" | "select";
 export interface IFormFieldConfig {
   editor: Editor;
   value: string;
   config: {
     name: string;
     type: string;
+    label?: string;
+    options?: any[];
     //placeholder:string
   };
   validation: {
@@ -17,6 +19,7 @@ export interface IFormFieldConfig {
   };
   isValid: boolean;
   validationMessage: string;
+  showLabel?: boolean;
 }
 export interface IFormFieldsProps {
   id: keyof IFormData;
@@ -45,11 +48,35 @@ const FormField: FC<IFormFieldsProps> = props => {
       case "input":
         formTemplate = (
           <div>
+            {formData.showLabel ? (
+              <div className="label_inputs">{formData.config.label}</div>
+            ) : null}
             <input
               {...formData.config}
               value={formData.value}
               onChange={event => change({ event, id })}
             ></input>
+            {showError(formData)}
+          </div>
+        );
+        break;
+      case "select":
+        formTemplate = (
+          <div>
+            {formData.showLabel ? (
+              <div className="label_inputs">{formData.config.label}</div>
+            ) : null}
+            <select
+              value={formData.value}
+              onChange={event => change({ event, id })}
+            >
+              <option value="">Select One</option>
+              {formData.config.options?.map(item => (
+                <option key={item.key} value={item.key}>
+                  {item.value}
+                </option>
+              ))}
+            </select>
             {showError(formData)}
           </div>
         );
