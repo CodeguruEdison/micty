@@ -26,8 +26,8 @@ export default Tag;
 
 export const firebaseLooper = (
   snapshot: firebase.database.DataSnapshot
-): IMatch[] => {
-  const data: IMatch[] = [];
+): any[] => {
+  const data: any[] = [];
   snapshot.forEach(childSnapshot => {
     data.push({
       ...childSnapshot.val(),

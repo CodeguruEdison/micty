@@ -1,12 +1,16 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import AdminLayout from "../../Hoc/AdminLayout";
 import FormField from "../../ui/FormField";
-import { validate } from "../../ui/misc";
+import { validate, firebaseLooper } from "../../ui/misc";
 import { ITeam } from "../../../models/ITeam";
 import { IFormData } from "../../Home/Promotions/Enroll";
 import FormEvent from "react";
+import { RouteComponentProps } from "react-router-dom";
+import { firebaseDB, getTeamOptions, getMatchById } from "../../../firebase";
+import { IMatch } from "../../../models/IMatch";
 
-export interface IAddEditMatchProps {}
+export interface IAddEditMatchProps
+  extends RouteComponentProps<{ id: string }> {}
 export enum FormType {
   Add,
   Edit,
@@ -187,6 +191,51 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
   const [matchState, setMatchState] = useState<IAddEditMatchState>(initialData);
   const { formData, formType } = matchState;
   const formTypeName = FormType[matchState.formType];
+  const matchId = props.match.params.id;
+  useEffect(() => {
+    console.log(matchId);
+    let foundMatch = {} as IMatch; //new typeof(IMatch);
+    if (!matchId) {
+      ///ADD MATCH
+    } else {
+      getMatchById(matchId).then(result => {
+        foundMatch = result as IMatch;
+      });
+      getTeamOptions(matchId).then(
+        teamOptions => {
+          //console.log(result);
+          handleUpdateFields(foundMatch, teamOptions, "Edit Team", matchId);
+        },
+        error => {}
+      );
+    }
+  }, []);
+  const handleUpdateFields = (
+    match: IMatch,
+    teamOptions: { key: string; value: string }[],
+    type: string,
+    matchId: string
+  ) => {
+    const newFormData = {
+      ...formData
+    };
+    type matchKeys = keyof IMatch;
+    for (let key in newFormData) {
+      if (match) {
+        newFormData[key].value = match[key as matchKeys] as any;
+        newFormData[key].isValid = true;
+      }
+      if (key === "local" || key === "away") {
+        newFormData[key].config.options = teamOptions;
+      }
+    }
+    /*const formType = FormType[type];
+    console.log(newFormData);
+    setMatchState({
+      ...matchState
+      formType:
+    });*/
+  };
   const handleOnChange = () => {};
   const handleOnSubmit = () => {};
   const handleAddOrEdit = (e: React.FormEvent<HTMLButtonElement>) => {

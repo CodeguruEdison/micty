@@ -4,6 +4,7 @@ import "firebase/database";
 import { firebaseLooper } from "./Components/ui/misc";
 import { IMatch } from "./models/IMatch";
 import "firebase/auth";
+import { ITeam } from "./models/ITeam";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC-3NUj9I6NQbiy5KQjn3_312qXWfQkgGs",
@@ -22,11 +23,70 @@ const firebaseDB = firebase.database();
 const firebaseAuth = firebase.auth();
 const firebaseMatches = firebaseDB.ref("matches");
 const firebasePromotions = firebaseDB.ref("promotions");
+const firebaseTeams = firebaseDB.ref("teams");
 
 const getMatches = async (limitTo: number): Promise<IMatch[]> => {
   //const eventref= firebaseDB.ref('matches');
   const snapshot = await firebaseMatches.limitToLast(limitTo).once("value");
   return firebaseLooper(snapshot);
+};
+const getMatchById = async (matchId: string): Promise<IMatch | undefined> => {
+  try {
+    const snapshot = await firebaseDB.ref(`matches/${matchId}`).once("value");
+    const match = snapshot.val();
+
+    return match;
+  } catch (error) {
+    console.log(error);
+  }
+};
+const getTeamOptions = async (
+  matchId: string
+): Promise<{ key: string; value: string }[]> => {
+  let teamOptions: { key: string; value: string }[] = [];
+  try {
+    const snapshot = await firebaseDB.ref(`matches/${matchId}`).once("value");
+    if (snapshot) {
+      //console.log(snapshot);
+      const match: IMatch = snapshot.val() as IMatch;
+      //console.log(match);
+      const teams = await getTeams(match, "Edit Team");
+      teams.forEach((team: ITeam) => {
+        // console.log(team.shortName);
+        //console.log(team);
+        teamOptions.push({
+          key: team.shortName,
+          value: team.shortName
+        });
+      });
+    }
+  } catch (error) {
+    console.log("error on getTeamOptions" + error);
+  }
+  return teamOptions;
+};
+const getTeams = async (match: IMatch, type: string): Promise<ITeam[]> => {
+  let teams: ITeam[] = {} as any;
+  try {
+    const snapshot = await firebaseTeams.once("value");
+    teams = firebaseLooper(snapshot);
+    //console.log(teams);
+  } catch (error) {
+    console.log(error);
+  }
+  return teams;
+};
+
+const getMatchById1 = (matchId: string): IMatch => {
+  let match: IMatch = {} as any;
+  firebaseDB
+    .ref(`matches/${matchId}`)
+    .once("value")
+    .then(snapshot => {
+      match = snapshot.val();
+      console.log(match);
+    });
+  return match;
 };
 
 export {
@@ -34,7 +94,10 @@ export {
   firebaseMatches,
   getMatches,
   firebasePromotions,
-  firebaseAuth
+  firebaseAuth,
+  firebaseTeams,
+  getMatchById,
+  getTeamOptions
 };
 //getMatches();
 
