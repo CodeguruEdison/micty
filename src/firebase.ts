@@ -40,6 +40,26 @@ const getMatchById = async (matchId: string): Promise<IMatch | undefined> => {
     console.log(error);
   }
 };
+
+const updateMatchById = async (matchId: string, dataToSubmit: any) => {
+  try {
+    const response = await firebaseDB
+      .ref(`matches/${matchId}`)
+      .update(dataToSubmit);
+    return response;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const addMatch = async (dataToSubmit: any) => {
+  try {
+    await firebaseDB.ref("matches").push(dataToSubmit);
+
+    //return respons
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 const getTeamOptions = async (
   matchId: string
 ): Promise<{ key: string; value: string }[]> => {
@@ -97,7 +117,10 @@ export {
   firebaseAuth,
   firebaseTeams,
   getMatchById,
-  getTeamOptions
+  getTeamOptions,
+  getTeams,
+  updateMatchById,
+  addMatch
 };
 //getMatches();
 

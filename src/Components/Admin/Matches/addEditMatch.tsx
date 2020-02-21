@@ -3,21 +3,27 @@ import AdminLayout from "../../Hoc/AdminLayout";
 import FormField from "../../ui/FormField";
 import { validate, firebaseLooper } from "../../ui/misc";
 import { ITeam } from "../../../models/ITeam";
-import { IFormData } from "../../Home/Promotions/Enroll";
+import { IFormData, IUpdateForm } from "../../Home/Promotions/Enroll";
 import FormEvent from "react";
 import { RouteComponentProps } from "react-router-dom";
-import { firebaseDB, getTeamOptions, getMatchById } from "../../../firebase";
+import {
+  getTeamOptions,
+  getMatchById,
+  getTeams,
+  updateMatchById,
+  addMatch
+} from "../../../firebase";
 import { IMatch } from "../../../models/IMatch";
 
 export interface IAddEditMatchProps
   extends RouteComponentProps<{ id: string }> {}
 export enum FormType {
-  Add,
-  Edit,
+  "Add Match",
+  "Edit Match",
   Unknown
 }
 export interface IAddEditMatchState {
-  matchId?: number;
+  matchId?: string;
   formType: FormType;
   formError: boolean;
   formSuccess: string;
@@ -27,7 +33,7 @@ export interface IAddEditMatchState {
 
 export const AddEditMatch: FC<IAddEditMatchProps> = props => {
   const initialData: IAddEditMatchState = {
-    matchId: 0,
+    matchId: "",
     formType: FormType.Unknown,
     formError: false,
     formSuccess: "",
@@ -43,8 +49,8 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
           placeholder: ""
         },
         validation: {
-          isRequired: true,
-          isEmail: true
+          isRequired: true
+          // isEmail: true
         },
         isValid: false,
         validationMessage: "",
@@ -190,21 +196,50 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
   };
   const [matchState, setMatchState] = useState<IAddEditMatchState>(initialData);
   const { formData, formType } = matchState;
-  const formTypeName = FormType[matchState.formType];
-  const matchId = props.match.params.id;
+  const formTypeName = FormType[formType];
+  const matchId = props.match.params.id || "";
+
   useEffect(() => {
     console.log(matchId);
     let foundMatch = {} as IMatch; //new typeof(IMatch);
+    let teams = {} as ITeam[];
     if (!matchId) {
       ///ADD MATCH
-    } else {
-      getMatchById(matchId).then(result => {
-        foundMatch = result as IMatch;
+      getTeams(foundMatch, formTypeName).then(result => {
+        teams = result as ITeam[];
       });
       getTeamOptions(matchId).then(
         teamOptions => {
           //console.log(result);
-          handleUpdateFields(foundMatch, teamOptions, "Edit Team", matchId);
+          handleUpdateFields(
+            foundMatch,
+            teams,
+            teamOptions,
+            "Add Match",
+            matchId
+          );
+        },
+        error => {
+          console.log(error);
+        }
+      );
+    } else {
+      getMatchById(matchId).then(result => {
+        foundMatch = result as IMatch;
+      });
+      getTeams(foundMatch, formTypeName).then(result => {
+        teams = result as ITeam[];
+      });
+      getTeamOptions(matchId).then(
+        teamOptions => {
+          //console.log(result);
+          handleUpdateFields(
+            foundMatch,
+            teams,
+            teamOptions,
+            "Edit Match",
+            matchId
+          );
         },
         error => {}
       );
@@ -212,8 +247,9 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
   }, []);
   const handleUpdateFields = (
     match: IMatch,
+    teams: ITeam[],
     teamOptions: { key: string; value: string }[],
-    type: string,
+    type: keyof typeof FormType,
     matchId: string
   ) => {
     const newFormData = {
@@ -222,7 +258,7 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
     type matchKeys = keyof IMatch;
     for (let key in newFormData) {
       if (match) {
-        newFormData[key].value = match[key as matchKeys] as any;
+        newFormData[key].value = (match[key as matchKeys] || "") as any;
         newFormData[key].isValid = true;
       }
       if (key === "local" || key === "away") {
@@ -230,17 +266,95 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
       }
     }
     /*const formType = FormType[type];
-    console.log(newFormData);
+    console.log(newFormData);*/
     setMatchState({
-      ...matchState
-      formType:
-    });*/
+      ...matchState,
+      formType: FormType[type],
+      matchId: matchId,
+      formData: newFormData,
+      teams: teams
+    });
   };
-  const handleOnChange = () => {};
-  const handleOnSubmit = () => {};
+  const handleOnChange = (element: IUpdateForm) => {
+    console.log(element);
+    const newElement = { ...formData[element.id] };
+    //console.log((element.event.target as any).value);
+    newElement.value = (element.event.target as any).value;
+
+    let validData = validate(newElement);
+    newElement.isValid = validData[0].isValid;
+    newElement.validationMessage = validData[0].message;
+
+    formData[element.id] = newElement;
+    console.log(formData);
+
+    setMatchState({ ...matchState, formData: formData, formError: false });
+  };
+  const successForm = (message: string) => {
+    setMatchState({
+      ...matchState,
+      formSuccess: message
+    });
+    setTimeout(() => {
+      setMatchState({
+        ...matchState,
+        formSuccess: ""
+      });
+    }, 2000);
+  };
+  const handleOnSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    let dataToSubmit: { [k: string]: any } = {};
+    let formIsValid = true;
+    for (let element in formData) {
+      const key = element as keyof IFormData;
+      dataToSubmit[element] = formData[key].value;
+      formIsValid = formData[key].isValid && formIsValid;
+      //console.log(formData[keyOf].value);
+    }
+    matchState.teams.forEach(team => {
+      if (team.shortName === dataToSubmit.local) {
+        dataToSubmit["localThmb"] = team.thmb;
+      }
+      if (team.shortName === dataToSubmit.away) {
+        dataToSubmit["awayThmb"] = team.thmb;
+      }
+    });
+
+    if (formIsValid) {
+      if (matchState.formType === FormType["Edit Match"]) {
+        try {
+          await updateMatchById(matchState.matchId || "", dataToSubmit);
+          successForm("Updated Successfully");
+        } catch (e) {
+          setMatchState({
+            ...matchState,
+            formError: true
+          });
+        }
+      } else {
+        try {
+          await addMatch(dataToSubmit);
+          props.history.push("/admin_matches");
+        } catch (e) {
+          setMatchState({
+            ...matchState,
+            formError: true
+          });
+        }
+        ///Add Match
+      }
+      // console.log(dataToSubmit);
+    } else {
+      setMatchState({
+        ...matchState,
+        formError: true
+      });
+    }
+  };
   const handleAddOrEdit = (e: React.FormEvent<HTMLButtonElement>) => {
-    console.log(e.currentTarget.innerText);
-    e.preventDefault();
+    //console.log(e.currentTarget.innerText);
+    //e.preventDefault();
   };
   return (
     <AdminLayout>
@@ -251,7 +365,7 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
             <FormField
               id={"date"}
               formData={formData.date}
-              change={handleOnChange}
+              change={({ event, id }) => handleOnChange({ event, id })}
             ></FormField>
 
             <div className="select_team_layout">
@@ -261,14 +375,14 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
                   <FormField
                     id={"local"}
                     formData={formData.local}
-                    change={handleOnChange}
+                    change={({ event, id }) => handleOnChange({ event, id })}
                   ></FormField>
                 </div>
                 <div>
                   <FormField
                     id={"resultLocal"}
                     formData={formData.resultLocal}
-                    change={handleOnChange}
+                    change={({ event, id }) => handleOnChange({ event, id })}
                   ></FormField>
                 </div>
               </div>
@@ -280,14 +394,14 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
                   <FormField
                     id={"away"}
                     formData={formData.away}
-                    change={handleOnChange}
+                    change={({ event, id }) => handleOnChange({ event, id })}
                   ></FormField>
                 </div>
                 <div>
                   <FormField
                     id={"resultAway"}
                     formData={formData.resultAway}
-                    change={handleOnChange}
+                    change={({ event, id }) => handleOnChange({ event, id })}
                   ></FormField>
                 </div>
               </div>
@@ -301,7 +415,7 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
               <FormField
                 id={"stadium"}
                 formData={formData.stadium}
-                change={handleOnChange}
+                change={({ event, id }) => handleOnChange({ event, id })}
               ></FormField>
             </div>
             <div className="split_fields last">
@@ -313,7 +427,7 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
               <FormField
                 id={"final"}
                 formData={formData.final}
-                change={handleOnChange}
+                change={({ event, id }) => handleOnChange({ event, id })}
               ></FormField>
             </div>
             <div className="success_label">{matchState.formSuccess}</div>
