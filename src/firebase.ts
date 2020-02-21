@@ -5,6 +5,7 @@ import { firebaseLooper } from "./Components/ui/misc";
 import { IMatch } from "./models/IMatch";
 import "firebase/auth";
 import { ITeam } from "./models/ITeam";
+import IPlayer from "./models/IPlayer";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC-3NUj9I6NQbiy5KQjn3_312qXWfQkgGs",
@@ -24,6 +25,15 @@ const firebaseAuth = firebase.auth();
 const firebaseMatches = firebaseDB.ref("matches");
 const firebasePromotions = firebaseDB.ref("promotions");
 const firebaseTeams = firebaseDB.ref("teams");
+const firebasePlayers = firebaseDB.ref("players");
+
+/**************************Players********************************** */
+const getPlayers = async (): Promise<IPlayer[]> => {
+  const snapshot = await firebasePlayers.once("value");
+  return firebaseLooper(snapshot);
+};
+
+/*****************************End players***************************** */
 
 const getMatches = async (limitTo: number): Promise<IMatch[]> => {
   //const eventref= firebaseDB.ref('matches');
@@ -120,7 +130,9 @@ export {
   getTeamOptions,
   getTeams,
   updateMatchById,
-  addMatch
+  addMatch,
+  firebasePlayers,
+  getPlayers
 };
 //getMatches();
 

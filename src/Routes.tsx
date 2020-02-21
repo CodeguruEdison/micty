@@ -10,6 +10,7 @@ import PrivateRoute from "./Components/authRoutes/privateRoute";
 import PublicRoute from "./Components/authRoutes/publicRoutes";
 import AdminMatches from "./Components/Admin/Matches/index";
 import { AddEditMatch } from "./Components/Admin/Matches/addEditMatch";
+import AdminPlayers from "./Components/Admin/players";
 
 const Routes: React.FC<IRoutes> = props => {
   const { user } = props;
@@ -19,6 +20,13 @@ const Routes: React.FC<IRoutes> = props => {
   return (
     <Layout>
       <Switch>
+        <PrivateRoute
+          {...props}
+          exact={true}
+          component={AdminPlayers}
+          path="/admin_players"
+          redirectUrl="/sign_in"
+        />
         <PrivateRoute
           {...props}
           exact={true}
