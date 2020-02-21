@@ -11,6 +11,7 @@ import PublicRoute from "./Components/authRoutes/publicRoutes";
 import AdminMatches from "./Components/Admin/Matches/index";
 import { AddEditMatch } from "./Components/Admin/Matches/addEditMatch";
 import AdminPlayers from "./Components/Admin/players";
+import AddEditPlayer from "./Components/Admin/players/addEditPlayer";
 
 const Routes: React.FC<IRoutes> = props => {
   const { user } = props;
@@ -27,6 +28,20 @@ const Routes: React.FC<IRoutes> = props => {
           path="/admin_players"
           redirectUrl="/sign_in"
         />
+        <PrivateRoute
+          {...props}
+          exact={true}
+          component={AddEditPlayer}
+          path="/admin_players/edit_match"
+          redirectUrl="/sign_in"
+        ></PrivateRoute>
+        <PrivateRoute
+          {...props}
+          exact={true}
+          component={AddEditPlayer}
+          path="/admin_players/edit_match/:id"
+          redirectUrl="/sign_in"
+        ></PrivateRoute>
         <PrivateRoute
           {...props}
           exact={true}
