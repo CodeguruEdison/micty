@@ -113,19 +113,92 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
       }
     }
   };
+  const playerId = props.match.params.id || null;
   const [playerState, setPlayerState] = useState<IAddEditPlayerState>(
     initialState
   );
-  const { formType } = playerState;
+  useEffect(() => {
+    if (!playerId) {
+      setPlayerState({
+        ...playerState,
+        formType: FormType["Add Player"]
+      });
+    }
+  }, []);
+  const { formType, formData } = playerState;
   const formTypeName = FormType[formType];
-  const handleOnSubmit = () => {};
+  const handleOnSubmit = async (
+    event: React.FormEvent<HTMLFormElement | HTMLButtonElement>
+  ) => {
+    let dataToSubmit: { [k: string]: any } = {};
+    let formIsValid = true;
+    for (let element in formData) {
+      const key = element as keyof IFormData;
+      dataToSubmit[element] = formData[key].value;
+      formIsValid = formData[key].isValid && formIsValid;
+      //console.log(formData[keyOf].value);
+    }
+    console.log(formIsValid);
+    if (formIsValid) {
+    } else {
+      setPlayerState({
+        ...playerState,
+        formError: true
+      });
+    }
+    event.preventDefault();
+  };
+  const handleOnChange = (element: IUpdateForm) => {
+    console.log(element);
+    const newElement = { ...formData[element.id] };
+    //console.log((element.event.target as any).value);
+    newElement.value = (element.event.target as any).value;
+
+    let validData = validate(newElement);
+    newElement.isValid = validData[0].isValid;
+    newElement.validationMessage = validData[0].message;
+
+    formData[element.id] = newElement;
+    console.log(formData);
+
+    setPlayerState({ ...playerState, formData: formData, formError: false });
+  };
   return (
     <AdminLayout>
-      <div className="editPlayers_dialog_wrapper">
+      <div className="editplayers_dialog_wrapper">
         <h2>{formTypeName}</h2>
-      </div>
-      <div>
-        <form onSubmit={handleOnSubmit}></form>
+
+        <div>
+          <form onSubmit={handleOnSubmit} className="form-group">
+            <FormField
+              id={"name"}
+              formData={formData.name}
+              change={({ event, id }) => handleOnChange({ event, id })}
+            ></FormField>
+            <FormField
+              id={"lastname"}
+              formData={formData.lastname}
+              change={({ event, id }) => handleOnChange({ event, id })}
+            ></FormField>
+            <FormField
+              id={"number"}
+              formData={formData.number}
+              change={({ event, id }) => handleOnChange({ event, id })}
+            ></FormField>
+            <FormField
+              id={"position"}
+              formData={formData.position}
+              change={({ event, id }) => handleOnChange({ event, id })}
+            ></FormField>
+            <div className="success_label">{playerState.formSuccess}</div>
+            {playerState.formError ? (
+              <div className="error_label">Something went wrong</div>
+            ) : null}
+            <div className="admin_submit">
+              <button onClick={handleOnSubmit}>{formTypeName}</button>
+            </div>
+          </form>
+        </div>
       </div>
     </AdminLayout>
   );

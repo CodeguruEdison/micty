@@ -25,7 +25,7 @@ export const AdminNav: FC<IAdminNavProps> = props => {
     },
     {
       title: "Add Players",
-      linkTo: "/admin_players/edit_player"
+      linkTo: "/admin_players/add_players"
     }
   ];
   const listStyle: CSSProperties = {

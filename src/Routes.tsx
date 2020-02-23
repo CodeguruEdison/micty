@@ -32,14 +32,14 @@ const Routes: React.FC<IRoutes> = props => {
           {...props}
           exact={true}
           component={AddEditPlayer}
-          path="/admin_players/edit_match"
+          path="/admin_players/add_players"
           redirectUrl="/sign_in"
         ></PrivateRoute>
         <PrivateRoute
           {...props}
           exact={true}
           component={AddEditPlayer}
-          path="/admin_players/edit_match/:id"
+          path="/admin_players/edit_player/:id"
           redirectUrl="/sign_in"
         ></PrivateRoute>
         <PrivateRoute
