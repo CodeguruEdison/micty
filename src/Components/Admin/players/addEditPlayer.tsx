@@ -14,7 +14,7 @@ import {
   updateMatchById,
   addMatch
 } from "../../../firebase";
-
+import ImageUploader from "../../ui/fileUploader";
 export interface IAddEditPlayerProps
   extends RouteComponentProps<{ id: string }> {}
 export enum FormType {
@@ -110,6 +110,21 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
         isValid: false,
         validationMessage: "",
         showLabel: true
+      },
+      image: {
+        editor: "image",
+        value: "",
+        validation: {
+          required: true
+        },
+        config: {
+          label: "Player Image",
+          name: "image_input",
+          type: "file",
+          placeholder: ""
+        },
+        isValid: true,
+        validationMessage: ""
       }
     }
   };
@@ -163,6 +178,8 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
 
     setPlayerState({ ...playerState, formData: formData, formError: false });
   };
+  const handleResetImage = () => {};
+  const handleStoreFileName = (filename: string) => {};
   return (
     <AdminLayout>
       <div className="editplayers_dialog_wrapper">
@@ -170,6 +187,14 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
 
         <div>
           <form onSubmit={handleOnSubmit} className="form-group">
+            <ImageUploader
+              dir="players"
+              tag={"Player Image"}
+              defaultImg={playerState.defaultImg}
+              defaultImgName={playerState.formData.image.value}
+              resetImage={() => handleResetImage()}
+              onSuccessUpload={filename => handleStoreFileName(filename)}
+            ></ImageUploader>
             <FormField
               id={"name"}
               formData={formData.name}

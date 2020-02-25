@@ -1,7 +1,12 @@
 import React, { FC } from "react";
 import { IUpdateForm, IFormData } from "../Home/Promotions/Enroll";
 
-export type Editor = "input" | "multilinetextbox" | "dropdown" | "select";
+export type Editor =
+  | "input"
+  | "multilinetextbox"
+  | "dropdown"
+  | "select"
+  | "image";
 export interface IFormFieldConfig {
   editor: Editor;
   value: string;

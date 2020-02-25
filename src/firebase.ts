@@ -4,6 +4,7 @@ import "firebase/database";
 import { firebaseLooper } from "./Components/ui/misc";
 import { IMatch } from "./models/IMatch";
 import "firebase/auth";
+import "firebase/storage";
 import { ITeam } from "./models/ITeam";
 import IPlayer from "./models/IPlayer";
 
@@ -26,6 +27,11 @@ const firebaseMatches = firebaseDB.ref("matches");
 const firebasePromotions = firebaseDB.ref("promotions");
 const firebaseTeams = firebaseDB.ref("teams");
 const firebasePlayers = firebaseDB.ref("players");
+const firebaseStorage = firebaseDB.ref("storage");
+
+const getFireBaseStorage = (storagePath: string) => {
+  return firebaseDB.ref(storagePath);
+};
 
 /**************************Players********************************** */
 const getPlayers = async (): Promise<IPlayer[]> => {
@@ -132,7 +138,8 @@ export {
   updateMatchById,
   addMatch,
   firebasePlayers,
-  getPlayers
+  getPlayers,
+  getFireBaseStorage
 };
 //getMatches();
 
