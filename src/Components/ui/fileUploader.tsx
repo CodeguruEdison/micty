@@ -1,7 +1,7 @@
 import React, { FC, Fragment, useState, useEffect } from "react";
 import FileUploader from "react-firebase-file-uploader";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { getFireBaseStorage } from "../../firebase";
+import { getFireBaseStorage, firebase, getPlayerImage } from "../../firebase";
 
 export interface IFileUploaderProps {
   dir: string;
@@ -28,7 +28,7 @@ const ImageUploader: FC<IFileUploaderProps> = props => {
   const [uploadState, setLoaderState] = useState<IFileUploadState>(
     defaultState
   );
-  const { isUploading } = uploadState;
+  const { isUploading, fileURL } = uploadState;
   useEffect(() => {
     setLoaderState({
       ...uploadState,
@@ -40,12 +40,25 @@ const ImageUploader: FC<IFileUploaderProps> = props => {
   const handleUploadStart = () => {
     setLoaderState({ ...uploadState, isUploading: true });
   };
-  const handleUploadError = () => {
+  const handleUploadError = (error: any) => {
+    console.log(error);
     setLoaderState({ ...uploadState, isUploading: false });
   };
-    const handleUploadSuccess = () => {
-      
+  const handleUploadSuccess = async (filename: string) => {
+    console.log(filename);
+    setLoaderState({
+      ...uploadState,
+      name: filename,
+      isUploading: false
+    });
+    const fileURL = await getPlayerImage(dir, filename);
+    console.log(fileURL);
+    setLoaderState({
+      ...uploadState,
+      fileURL: fileURL
+    });
   };
+  const handleRemove = async () => {};
   return (
     <div>
       {!uploadState.fileURL ? (
@@ -71,6 +84,14 @@ const ImageUploader: FC<IFileUploaderProps> = props => {
             style={{ color: "#98c6e9" }}
             thickness={7}
           ></CircularProgress>
+        </div>
+      ) : null}
+      {uploadState.fileURL ? (
+        <div className="image_upload_container">
+          <img style={{ width: "100%" }} src={fileURL} alt={uploadState.name} />
+          <div className="remove" onClick={handleRemove}>
+            Remove
+          </div>
         </div>
       ) : null}
     </div>

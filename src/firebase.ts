@@ -27,10 +27,10 @@ const firebaseMatches = firebaseDB.ref("matches");
 const firebasePromotions = firebaseDB.ref("promotions");
 const firebaseTeams = firebaseDB.ref("teams");
 const firebasePlayers = firebaseDB.ref("players");
-const firebaseStorage = firebaseDB.ref("storage");
+const firebaseStorage = firebase.storage();
 
 const getFireBaseStorage = (storagePath: string) => {
-  return firebaseDB.ref(storagePath);
+  return firebaseStorage.ref(storagePath);
 };
 
 /**************************Players********************************** */
@@ -38,7 +38,14 @@ const getPlayers = async (): Promise<IPlayer[]> => {
   const snapshot = await firebasePlayers.once("value");
   return firebaseLooper(snapshot);
 };
-
+const getPlayerImage = async (
+  dir: string,
+  filename: string
+): Promise<string> => {
+  return await getFireBaseStorage(dir)
+    .child(filename)
+    .getDownloadURL();
+};
 /*****************************End players***************************** */
 
 const getMatches = async (limitTo: number): Promise<IMatch[]> => {
@@ -139,7 +146,10 @@ export {
   addMatch,
   firebasePlayers,
   getPlayers,
-  getFireBaseStorage
+  getFireBaseStorage,
+  firebaseStorage,
+  firebase,
+  getPlayerImage
 };
 //getMatches();
 

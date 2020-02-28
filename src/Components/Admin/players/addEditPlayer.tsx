@@ -12,7 +12,8 @@ import {
   getMatchById,
   getTeams,
   updateMatchById,
-  addMatch
+  addMatch,
+  firebaseStorage
 } from "../../../firebase";
 import ImageUploader from "../../ui/fileUploader";
 export interface IAddEditPlayerProps
@@ -188,7 +189,7 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
         <div>
           <form onSubmit={handleOnSubmit} className="form-group">
             <ImageUploader
-              dir="players"
+              dir={"players"}
               tag={"Player Image"}
               defaultImg={playerState.defaultImg}
               defaultImgName={playerState.formData.image.value}
