@@ -18,7 +18,7 @@ export interface IFileUploadState {
   defaultImg: string;
 }
 const ImageUploader: FC<IFileUploaderProps> = props => {
-  const { tag, dir } = props;
+  const { tag, dir, onSuccessUpload, resetImage } = props;
   const defaultState: IFileUploadState = {
     name: "",
     isUploading: false,
@@ -57,8 +57,18 @@ const ImageUploader: FC<IFileUploaderProps> = props => {
       ...uploadState,
       fileURL: fileURL
     });
+    onSuccessUpload(filename);
   };
-  const handleRemove = async () => {};
+  const handleRemove = () => {
+    console.log("handleRemove clicked");    
+    setLoaderState({
+      ...uploadState,
+      name: "",
+      fileURL: "",
+      isUploading: false
+    });
+    resetImage();
+  };
   return (
     <div>
       {!uploadState.fileURL ? (
@@ -89,7 +99,7 @@ const ImageUploader: FC<IFileUploaderProps> = props => {
       {uploadState.fileURL ? (
         <div className="image_upload_container">
           <img style={{ width: "100%" }} src={fileURL} alt={uploadState.name} />
-          <div className="remove" onClick={handleRemove}>
+          <div className="remove" onClick={() => handleRemove()}>
             Remove
           </div>
         </div>

@@ -279,7 +279,7 @@ export const AddEditMatch: FC<IAddEditMatchProps> = props => {
     console.log(element);
     const newElement = { ...formData[element.id] };
     //console.log((element.event.target as any).value);
-    newElement.value = (element.event.target as any).value;
+    newElement.value = (element.event?.target as any).value;
 
     let validData = validate(newElement);
     newElement.isValid = validData[0].isValid;

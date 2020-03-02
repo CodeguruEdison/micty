@@ -103,9 +103,9 @@ const SignIn: FC<IFormProps> = props => {
     // const id:any = element.id;
     //console.log(element.id);
     //  console.log(newFormData[id]);
-    if (element.event.target instanceof HTMLInputElement) {
+    if (element.event?.target instanceof HTMLInputElement) {
       const newElement = { ...newFormData[element.id] };
-      newElement.value = element.event.target.value;
+      newElement.value = element.event?.target.value;
 
       let validData = validate(newElement);
       newElement.isValid = validData[0].isValid;

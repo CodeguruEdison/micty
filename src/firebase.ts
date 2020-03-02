@@ -46,6 +46,17 @@ const getPlayerImage = async (
     .child(filename)
     .getDownloadURL();
 };
+const updatePlayer = async (
+  playerId: string,
+  dataToSubmit: any
+): Promise<string> => {
+  try {
+    await firebaseDB.ref(`players/${playerId}`).update(dataToSubmit);
+    return "Update correctly";
+  } catch (exception) {
+    throw exception;
+  }
+};
 /*****************************End players***************************** */
 
 const getMatches = async (limitTo: number): Promise<IMatch[]> => {
@@ -149,7 +160,8 @@ export {
   getFireBaseStorage,
   firebaseStorage,
   firebase,
-  getPlayerImage
+  getPlayerImage,
+  updatePlayer
 };
 //getMatches();
 

@@ -13,7 +13,8 @@ import {
   getTeams,
   updateMatchById,
   addMatch,
-  firebaseStorage
+  firebaseStorage,
+  updatePlayer
 } from "../../../firebase";
 import ImageUploader from "../../ui/fileUploader";
 export interface IAddEditPlayerProps
@@ -124,7 +125,7 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
           type: "file",
           placeholder: ""
         },
-        isValid: true,
+        isValid: false,
         validationMessage: ""
       }
     }
@@ -143,6 +144,18 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
   }, []);
   const { formType, formData } = playerState;
   const formTypeName = FormType[formType];
+  const successForm = (message: string) => {
+    setPlayerState({
+      ...playerState,
+      formSuccess: message
+    });
+    setTimeout(() => {
+      setPlayerState({
+        ...playerState,
+        formSuccess: ""
+      });
+    }, 2000);
+  };
   const handleOnSubmit = async (
     event: React.FormEvent<HTMLFormElement | HTMLButtonElement>
   ) => {
@@ -156,6 +169,41 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
     }
     console.log(formIsValid);
     if (formIsValid) {
+      if (playerState.formType === FormType["Edit Player"]) {
+        try {
+          const response = await updatePlayer(
+            playerState.playerId || "",
+            dataToSubmit
+          );
+          successForm(response);
+        } catch (error) {
+          setPlayerState({
+            ...playerState,
+            formError: true
+          });
+        }
+
+        /*firebaseDB
+          .ref(`players/${this.state.playerId}`)
+          .update(dataToSubmit)
+          .then(() => {
+            this.successForm("Update correctly");
+          })
+          .catch(e => {
+            this.setState({ formError: true });
+          });*/
+      } else {
+        /*firebasePlayers
+          .push(dataToSubmit)
+          .then(() => {
+            this.props.history.push("/admin_players");
+          })
+          .catch(e => {
+            this.setState({
+              formError: true
+            });
+          });*/
+      }
     } else {
       setPlayerState({
         ...playerState,
@@ -168,7 +216,11 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
     console.log(element);
     const newElement = { ...formData[element.id] };
     //console.log((element.event.target as any).value);
-    newElement.value = (element.event.target as any).value;
+    if (typeof element.content === "undefined") {
+      newElement.value = (element.event?.target as any).value;
+    } else {
+      newElement.value = element.content as any;
+    }
 
     let validData = validate(newElement);
     newElement.isValid = validData[0].isValid;
@@ -179,8 +231,40 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
 
     setPlayerState({ ...playerState, formData: formData, formError: false });
   };
-  const handleResetImage = () => {};
-  const handleStoreFileName = (filename: string) => {};
+  const handleResetImage = () => {
+    const newFormdata = {
+      ...playerState.formData
+    };
+    newFormdata["image"].value = "";
+    newFormdata["image"].isValid = false;
+
+    setPlayerState({
+      ...playerState,
+      defaultImg: "",
+      formData: newFormdata
+    });
+
+    /*setPlayerState({
+      ...playerState,
+      formData: {
+        ...playerState.formData,
+        image: {
+          ...playerState.formData.image,
+          value: "",
+          isValid: false
+        }
+      }
+    });*/
+    setTimeout(() => {
+      console.log(playerState);
+    }, 30);
+
+    // console.log(playerState);
+  };
+  const handleStoreFileName = (filename: string) => {
+    console.log(filename);
+    handleOnChange({ id: "image", content: filename });
+  };
   return (
     <AdminLayout>
       <div className="editplayers_dialog_wrapper">

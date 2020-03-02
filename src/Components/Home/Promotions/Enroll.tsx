@@ -39,8 +39,9 @@ export interface IEnrollState extends IEnrollData {
   success: string;
 }
 export interface IUpdateForm {
-  event: React.ChangeEvent<HTMLElement>;
+  event?: React.ChangeEvent<HTMLElement>;
   id: keyof IFormData;
+  content?: string;
 }
 export const Enroll: FC = () => {
   const initialState: IEnrollState = {
@@ -145,7 +146,7 @@ export const Enroll: FC = () => {
     // const id:any = element.id;
     //console.log(element.id);
     //  console.log(newFormData[id]);
-    if (element.event.target instanceof HTMLInputElement) {
+    if (element.event?.target instanceof HTMLInputElement) {
       const currentTarget = element.event.target as HTMLInputElement;
       const newElement = { ...newFormData[element.id] };
       newElement.value = element.event.target.value;
