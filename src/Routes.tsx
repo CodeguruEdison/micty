@@ -12,6 +12,7 @@ import AdminMatches from "./Components/Admin/Matches/index";
 import { AddEditMatch } from "./Components/Admin/Matches/addEditMatch";
 import AdminPlayers from "./Components/Admin/players";
 import AddEditPlayer from "./Components/Admin/players/addEditPlayer";
+import TheTeam from "./Components/theTeam";
 
 const Routes: React.FC<IRoutes> = props => {
   const { user } = props;
@@ -21,6 +22,14 @@ const Routes: React.FC<IRoutes> = props => {
   return (
     <Layout>
       <Switch>
+        <PublicRoute
+          restricted={false}
+          {...props}
+          path="/the_team"
+          exact={true}
+          component={TheTeam}
+        ></PublicRoute>
+
         <PrivateRoute
           {...props}
           exact={true}
@@ -39,7 +48,7 @@ const Routes: React.FC<IRoutes> = props => {
           {...props}
           exact={true}
           component={AddEditPlayer}
-          path="/admin_players/edit_player/:id"
+          path="/admin_players/edit_players/:id"
           redirectUrl="/sign_in"
         ></PrivateRoute>
         <PrivateRoute

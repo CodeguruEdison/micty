@@ -5,4 +5,5 @@ export default interface IPlayer {
   number: string;
   position: string;
   id?: string;
+  url: string;
 }

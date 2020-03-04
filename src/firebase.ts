@@ -42,9 +42,15 @@ const getPlayerImage = async (
   dir: string,
   filename: string
 ): Promise<string> => {
-  return await getFireBaseStorage(dir)
-    .child(filename)
-    .getDownloadURL();
+  let result: string = "";
+  try {
+    result = await getFireBaseStorage(dir)
+      .child(filename)
+      .getDownloadURL();
+  } catch (ex) {
+    result = "";
+  }
+  return result;
 };
 const updatePlayer = async (
   playerId: string,
@@ -56,6 +62,24 @@ const updatePlayer = async (
   } catch (exception) {
     throw exception;
   }
+};
+const addPlayer = async (dataToSubmit: any): Promise<void> => {
+  try {
+    await firebasePlayers.push(dataToSubmit);
+  } catch (exception) {
+    throw exception;
+  }
+};
+const getPlayerById = async (
+  playerId: string
+): Promise<{ player: IPlayer; defaultImg: string }> => {
+  const snapshot = await firebaseDB.ref(`players/${playerId}`).once("value");
+  const player = snapshot.val();
+  const defaultImg: string = await getPlayerImage("players", player.image);
+  return {
+    player,
+    defaultImg
+  };
 };
 /*****************************End players***************************** */
 
@@ -161,7 +185,9 @@ export {
   firebaseStorage,
   firebase,
   getPlayerImage,
-  updatePlayer
+  updatePlayer,
+  addPlayer,
+  getPlayerById
 };
 //getMatches();
 

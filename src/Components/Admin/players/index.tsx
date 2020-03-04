@@ -60,12 +60,12 @@ const AdminPlayers: FC<IAdminPlayersProps> = props => {
                 ? playersState.players.map(row => (
                     <TableRow key={row.id}>
                       <TableCell align="left">
-                        <Link to={`/admin_players/add_players/${row.id}`}>
+                        <Link to={`/admin_players/edit_players/${row.id}`}>
                           {row.name}
                         </Link>
                       </TableCell>
                       <TableCell align="left">
-                        <Link to={`/admin_players/add_players/${row.id}`}>
+                        <Link to={`/admin_players/edit_players/${row.id}`}>
                           {row.lastname}
                         </Link>
                       </TableCell>

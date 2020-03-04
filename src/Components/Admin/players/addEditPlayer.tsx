@@ -14,9 +14,12 @@ import {
   updateMatchById,
   addMatch,
   firebaseStorage,
-  updatePlayer
+  updatePlayer,
+  addPlayer,
+  getPlayerById
 } from "../../../firebase";
 import ImageUploader from "../../ui/fileUploader";
+import IPlayer from "../../../models/IPlayer";
 export interface IAddEditPlayerProps
   extends RouteComponentProps<{ id: string }> {}
 export enum FormType {
@@ -131,19 +134,53 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
     }
   };
   const playerId = props.match.params.id || null;
+
+  //console.log(props.match);
   const [playerState, setPlayerState] = useState<IAddEditPlayerState>(
     initialState
   );
+  const { formType, formData } = playerState;
+  const formTypeName = FormType[formType];
   useEffect(() => {
+    // let didCancel = false;
     if (!playerId) {
       setPlayerState({
         ...playerState,
         formType: FormType["Add Player"]
       });
+    } else {
+      getPlayerById(playerId)
+        .then(data => {
+          const playerData: {
+            player: IPlayer;
+            defaultImg: string;
+          } = data;
+          type playerKeys = keyof IPlayer;
+          const newFormData = { ...formData };
+          console.log(playerData);
+          for (let key in newFormData) {
+            //console.log(key);
+            newFormData[key].value = (playerData.player[key as playerKeys] ||
+              "") as any;
+            // console.log(playerData[key]);
+
+            newFormData[key].isValid = true;
+          }
+
+          setPlayerState({
+            ...playerState,
+            playerId,
+            defaultImg: playerData.defaultImg,
+            formType: FormType["Edit Player"],
+            formData: newFormData
+          });
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   }, []);
-  const { formType, formData } = playerState;
-  const formTypeName = FormType[formType];
+
   const successForm = (message: string) => {
     setPlayerState({
       ...playerState,
@@ -156,9 +193,11 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
       });
     }, 2000);
   };
+
   const handleOnSubmit = async (
     event: React.FormEvent<HTMLFormElement | HTMLButtonElement>
   ) => {
+    event.preventDefault();
     let dataToSubmit: { [k: string]: any } = {};
     let formIsValid = true;
     for (let element in formData) {
@@ -168,6 +207,7 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
       //console.log(formData[keyOf].value);
     }
     console.log(formIsValid);
+
     if (formIsValid) {
       if (playerState.formType === FormType["Edit Player"]) {
         try {
@@ -175,6 +215,7 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
             playerState.playerId || "",
             dataToSubmit
           );
+          
           successForm(response);
         } catch (error) {
           setPlayerState({
@@ -182,27 +223,16 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
             formError: true
           });
         }
-
-        /*firebaseDB
-          .ref(`players/${this.state.playerId}`)
-          .update(dataToSubmit)
-          .then(() => {
-            this.successForm("Update correctly");
-          })
-          .catch(e => {
-            this.setState({ formError: true });
-          });*/
       } else {
-        /*firebasePlayers
-          .push(dataToSubmit)
-          .then(() => {
-            this.props.history.push("/admin_players");
-          })
-          .catch(e => {
-            this.setState({
-              formError: true
-            });
-          });*/
+        try {
+          await addPlayer(dataToSubmit);
+          props.history.push("/admin_players");
+        } catch (exception) {
+          setPlayerState({
+            ...playerState,
+            formError: true
+          });
+        }
       }
     } else {
       setPlayerState({
@@ -210,7 +240,6 @@ const AddEditPlayer: FC<IAddEditPlayerProps> = props => {
         formError: true
       });
     }
-    event.preventDefault();
   };
   const handleOnChange = (element: IUpdateForm) => {
     console.log(element);
