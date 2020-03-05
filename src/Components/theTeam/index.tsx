@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState, useEffect, Fragment } from "react";
 import PlayerCard from "../ui/playerCard";
 import Fade from "react-reveal/Fade";
 import Stripes from "../../Resources/images/stripes.png";
@@ -17,7 +17,14 @@ export const TheTeam: FC<ITheTeamProps> = props => {
     players: []
   };
   const [teamState, setTeamState] = useState<ITheTeamState>(defaultTeamState);
-
+  const groupedPositions = teamState.players.reduce(
+    (g: any, player: IPlayer) => {
+      g[player.position] = g[player.position] || []; //Check the value exists, if not assign a new array
+      g[player.position].push(player); //Push the new value to the array
+      return g; //Very important! you need to return the value of g or it will become undefined on the next pass
+    },
+    {}
+  );
   useEffect(() => {
     getPlayers().then(players => {
       // console.log(players);
@@ -38,14 +45,15 @@ export const TheTeam: FC<ITheTeamProps> = props => {
           loading: false,
           players
         });
-        const grouped = players.reduce((g: any, player: IPlayer) => {
+        /*const grouped = players.reduce((g: any, player: IPlayer) => {
           g[player.position] = g[player.position] || []; //Check the value exists, if not assign a new array
           g[player.position].push(player); //Push the new value to the array
           return g; //Very important! you need to return the value of g or it will become undefined on the next pass
         }, {});
-        for (let key in grouped) {
-          console.log(key, grouped[key] as IPlayer[]);
-        }
+*/
+        //for (let key in grouped) {
+        // console.log(key, grouped[key] as IPlayer[]);
+        //}
 
         //console.log(players);
       });
@@ -59,8 +67,34 @@ export const TheTeam: FC<ITheTeamProps> = props => {
       {!teamState.loading ? (
         <div>
           <div className="team_category_wrapper">
-            <div className="title">Keepers</div>
-            <div className="team_cards"></div>
+            {Object.keys(groupedPositions).map((position, i) => {
+              const groupPlayers = groupedPositions[position] as IPlayer[];
+              return (
+                <Fragment key={position}>
+                  <div className="title">{position}</div>
+                  <div className="team_cards">
+                    {groupPlayers.map((player, index) => {
+                      return (
+                        <Fade
+                          delay={index * 20}
+                          left
+                          key={position + "-" + index}
+                        >
+                          <div className="item">
+                            <PlayerCard
+                              playernumber={player.number}
+                              lastname={player.lastname}
+                              name={player.name}
+                              background={player.url}
+                            ></PlayerCard>
+                          </div>
+                        </Fade>
+                      );
+                    })}
+                  </div>
+                </Fragment>
+              );
+            })}
           </div>
         </div>
       ) : null}
